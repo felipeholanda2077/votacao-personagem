@@ -3,8 +3,15 @@
   <h3>{{ nome() }}</h3>
   @if (totalVotos() === 0) {
     <p class="no-votes">Nenhum voto ainda</p>
+    
   } @else {
     <p>Votos: {{ totalVotos() }}</p>
   }
+
+  <p>Tipo: {{ type() }}</p>
+  <p>Status: {{ status() }}</p>
+  <p>Espécie: {{ species() }}</p>
+  <p>ID: {{ personagemId() }}</p>
+
   <button (click)="onVotar()">Votar</button>
 </div>

@@ -12,6 +12,9 @@ export class CardPersonagem {
   imagem = input<string>('');
   totalVotos = input<number>(0);
   personagemId = input<number>(0);
+  type = input<string>('');
+  status = input<string>('');
+  species = input<string>('');
 
   votou = output<number>();
 

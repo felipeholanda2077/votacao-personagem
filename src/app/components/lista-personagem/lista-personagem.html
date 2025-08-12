@@ -1,11 +1,60 @@
-<section class="grid">
-  @for (personagem of personagens(); track personagem.id) {
-    <app-card-personagem
-      [nome]="personagem.nome"
-      [imagem]="personagem.imagem"
-      [totalVotos]="personagem.votos"
-      [personagemId]="personagem.id"
-      (votou)="incrementarVoto($event)">
-    </app-card-personagem>
-  }
-</section>
+<div class="search-container">
+  <div class="search-box">
+    <input 
+      type="text" 
+      [value]="searchQuery()"
+      (input)="onSearchChange($any($event.target).value)" 
+      placeholder="Buscar personagens..." 
+      class="search-input"
+    >
+    @if (searchQuery()) {
+      <button (click)="clearSearch()" class="clear-search" aria-label="Limpar busca">
+        ×
+      </button>
+    }
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="loading">
+    @if (searchQuery()) {
+      Buscando personagens por "{{ searchQuery() }}"...
+    } @else {
+      Carregando personagens...
+    }
+  </div>
+} @else if (error()) {
+  <div class="error">
+    <p>{{ error() }}</p>
+    <button (click)="fetchCharacters(currentPage())">Tentar novamente</button>
+  </div>
+} @else {
+  <section class="grid">
+    @for (personagem of personagens(); track personagem.id) {
+      <app-card-personagem
+        [nome]="personagem.nome"
+        [imagem]="personagem.imagem"
+        [totalVotos]="personagem.votos"
+        [personagemId]="personagem.id"
+        [type]="personagem.type"
+        [status]="personagem.status"
+        [species]="personagem.species"
+        (votou)="incrementarVoto($event)">
+      </app-card-personagem>
+    }
+  </section>
+
+  <div class="pagination">
+    <button 
+      (click)="previousPage()" 
+      [disabled]="currentPage() === 1 || loading()">
+      Anterior
+    </button>
+    <span>Página {{ currentPage() }} de {{ totalPages() }}</span>
+    <button 
+      (click)="nextPage()" 
+      [disabled]="currentPage() === totalPages() || loading()">
+      Próxima
+    </button>
+  </div>
+}
