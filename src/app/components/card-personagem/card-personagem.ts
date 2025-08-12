@@ -21,4 +21,17 @@ export class CardPersonagem {
   onVotar() {
     this.votou.emit(this.personagemId());
   }
+
+  getStatusText(): string {
+    switch(this.status()) {
+      case 'Alive':
+        return 'Vivo';
+      case 'Dead':
+        return 'Morto';
+      case 'unknown':
+        return 'Desconhecido';
+      default:
+        return this.status();
+    }
+  }
 }
