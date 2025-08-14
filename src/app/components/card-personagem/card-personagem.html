@@ -1,16 +1,15 @@
 <div class="card">
   <div class="card-image-container">
     <img [src]="imagem()" [alt]="nome()" class="character-image" />
-    <span class="status-badge" [class.status-alive]="status() === 'Alive'" 
-                             [class.status-dead]="status() === 'Dead'"
-                             [class.status-unknown]="status() === 'unknown'">
+    <span class="status-badge" [class.status-alive]="status() === 'Alive'" [class.status-dead]="status() === 'Dead'"
+      [class.status-unknown]="status() === 'unknown'">
       {{ getStatusText() }}
     </span>
   </div>
-  
+
   <div class="card-content">
     <h3 class="character-name">{{ nome() }}</h3>
-    
+
     <div class="character-info">
       <div class="info-row">
         <span class="info-label">Espécie:</span>
@@ -21,20 +20,20 @@
         <span class="info-value">{{ type() || 'Não especificado' }}</span>
       </div>
     </div>
-    
+
     <div class="voting-section">
       @if (totalVotos() === 0) {
-        <p class="no-votes">Nenhum voto ainda</p>
+      <p class="no-votes">Nenhum voto ainda</p>
       } @else {
-        <p class="vote-count">{{ totalVotos() }} {{ totalVotos() === 1 ? 'voto' : 'votos' }}</p>
+      <p class="vote-count">{{ totalVotos() }} {{ totalVotos() === 1 ? 'voto' : 'votos' }}</p>
       }
-      
+
       <button class="vote-button" (click)="onVotar()">
         <span class="button-icon">👍</span>
         <span class="button-text">Votar</span>
       </button>
     </div>
   </div>
-  
+
   <div class="card-id">#{{ personagemId() }}</div>
 </div>
