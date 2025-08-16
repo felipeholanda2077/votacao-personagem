@@ -1,24 +1,31 @@
-@if (loading()) {
-  <div class="loading">
-    Carregando personagens...
+<div>
+  <h1>Personagens</h1>
+
+  <div *ngIf="loading" class="loading">
+    <p>Carregando personagens...</p>
   </div>
-} @else if (error()) {
-  <div class="error">
-    <p>{{ error() }}</p>
+
+  <div *ngIf="error" class="error">
+    <p>{{ error }}</p>
   </div>
-} @else {
-  <section class="grid">
-    @for (personagem of personagens(); track personagem.id) {
-      <app-card-personagem
-        [nome]="personagem.nome"
-        [imagem]="personagem.imagem"
-        [totalVotos]="personagem.votos"
-        [personagemId]="personagem.id"
-        [type]="personagem.type"
-        [status]="personagem.status"
-        [species]="personagem.species"
-        (votou)="incrementarVoto($event)">
-      </app-card-personagem>
-    }
-  </section>
-}
+
+  <div class="grid">
+    <div *ngFor="let personagem of personagens | slice:0:visibleCount" class="card">
+      <img [src]="personagem.imagem" [alt]="personagem.nome" />
+      <div class="info">
+        <h3>{{ personagem.nome }}</h3>
+        <div class="voting-section">
+          <span>Votos: {{ personagem.votos || 0 }}</span>
+          <button (click)="onVotar(personagem)" [disabled]="isVoting(personagem.id)">
+            {{ isVoting(personagem.id) ? 'Votando...' : 'Votar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pagination" *ngIf="!loading && !error && hasMore">
+    <button (click)="carregarMais()">Carregar mais</button>
+    <span>Mostrando {{ visibleCount }} de {{ personagens.length }}</span>
+  </div>
+</div>

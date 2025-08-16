@@ -1,48 +1,96 @@
-import { Component, signal, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CardPersonagem } from '../card-personagem/card-personagem';
-import { PersonagensService, IPersonagem } from '../../services/personagens';
+import { PersonagemService, Personagem } from '../../services/personagem.service';
+import { Subscription, timer } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-lista-personagem',
   standalone: true,
-  imports: [CommonModule, CardPersonagem],
+  imports: [CommonModule],
   templateUrl: './lista-personagem.html',
-  styleUrl: './lista-personagem.css',
+  styleUrls: ['./lista-personagem.css']
 })
 export class ListaPersonagem implements OnInit, OnDestroy {
-  private personagensService = inject(PersonagensService);
-  
-  personagens = signal<IPersonagem[]>([]);
-  loading = signal<boolean>(false);
-  error = signal<string>('');
+  personagens: Personagem[] = [];
+  private subscription: Subscription = new Subscription();
+  loading: boolean = true;
+  error: string | null = null;
+  visibleCount = 8;
+  private votingIds = new Set<number>();
+
+  constructor(private personagemService: PersonagemService) {}
 
   ngOnInit(): void {
     this.carregarPersonagens();
   }
 
-  ngOnDestroy(): void {
-    // Limpeza se necessário
-  }
-
   private carregarPersonagens(): void {
-    this.loading.set(true);
-    try {
-      const personagens = this.personagensService.getPersonagens();
-      this.personagens.set(personagens);
-    } catch (error) {
-      console.error('Erro ao carregar personagens:', error);
-      this.error.set('Erro ao carregar a lista de personagens.');
-    } finally {
-      this.loading.set(false);
-    }
+    this.subscription = timer(0, 30000) // Atualiza a cada 30 segundos
+      .pipe(
+        switchMap(() => this.personagemService.getPersonagens())
+      )
+      .subscribe({
+        next: (data: Personagem[]) => {
+          this.personagens = data;
+          this.loading = false;
+          this.error = null;
+        },
+        error: (error: any) => {
+          console.error('Erro ao carregar personagens:', error);
+          this.loading = false;
+          this.error = 'Erro ao carregar os personagens. Tente novamente mais tarde.';
+        }
+      });
   }
 
-  incrementarVoto(personagemId: number): void {
-    this.personagens.update(personagens => 
-      personagens.map(p => 
-        p.id === personagemId ? { ...p, votos: p.votos + 1 } : p
-      )
-    );
+  onVotar(personagem: Personagem): void {
+    if (this.votingIds.has(personagem.id)) return;
+    this.votingIds.add(personagem.id);
+
+    const index = this.personagens.findIndex(p => p.id === personagem.id);
+    if (index === -1) return;
+
+    const prevVotos = this.personagens[index].votos ?? 0;
+    // Optimistic UI update
+    this.personagens[index] = { ...this.personagens[index], votos: prevVotos + 1 };
+
+    this.personagemService.votar(personagem.id).subscribe({
+      next: (atualizado: Personagem | undefined) => {
+        // If API returns updated entity, sync it; otherwise keep optimistic value
+        if (atualizado && atualizado.id != null) {
+          const i = this.personagens.findIndex(p => p.id === atualizado.id);
+          if (i !== -1) {
+            this.personagens[i] = atualizado;
+          }
+        }
+      },
+      error: (error: any) => {
+        console.error('Erro ao votar:', error);
+        // Revert on error
+        this.personagens[index] = { ...this.personagens[index], votos: prevVotos };
+      },
+      complete: () => {
+        this.votingIds.delete(personagem.id);
+      }
+    });
+  }
+
+  carregarMais(): void {
+    this.visibleCount = Math.min(this.visibleCount + 8, this.personagens.length);
+  }
+
+  get hasMore(): boolean {
+    return this.personagens.length > this.visibleCount;
+  }
+
+  isVoting(id: number): boolean {
+    return this.votingIds.has(id);
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }

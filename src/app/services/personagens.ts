@@ -103,4 +103,11 @@ export class PersonagensService {
   getPersonagens(): IPersonagem[] {
     return [...this.personagens];
   }
+
+  adicionarVoto(idDoPersonagem: number): void {
+    const personagem = this.personagens.find(p => p.id === idDoPersonagem);
+    if (personagem) {
+      personagem.votos++;
+    }
+  }
 }
