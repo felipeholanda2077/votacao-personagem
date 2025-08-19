@@ -1,4 +1,8 @@
 import { Injectable } from '@angular/core';
+import { Personagem } from './personagem.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 export interface IPersonagem {
   id: number;
@@ -14,100 +18,26 @@ export interface IPersonagem {
   providedIn: 'root'
 })
 export class PersonagensService {
-  private personagens: IPersonagem[] = [
-    { 
-      id: 1, 
-      nome: 'Gandalf', 
-      imagem: 'assets/gandalf.jpg', 
-      votos: 0,
-      type: 'Maia',
-      status: 'Alive',
-      species: 'Maia'
-    },
-    { 
-      id: 2, 
-      nome: 'Frodo', 
-      imagem: 'assets/frodo.jpg', 
-      votos: 0,
-      type: 'Hobbit',
-      status: 'Alive',
-      species: 'Hobbit'
-    },
-    { 
-      id: 3, 
-      nome: 'Aragorn', 
-      imagem: 'assets/aragorn.jpg', 
-      votos: 0,
-      type: 'Human',
-      status: 'Alive',
-      species: 'Human'
-    },
-    { 
-      id: 4, 
-      nome: 'Legolas', 
-      imagem: 'assets/legolas.jpg', 
-      votos: 0,
-      type: 'Elf',
-      status: 'Alive',
-      species: 'Elf'
-    },
-    { 
-      id: 5, 
-      nome: 'Gimli', 
-      imagem: 'assets/gimli.jpg', 
-      votos: 0,
-      type: 'Dwarf',
-      status: 'Alive',
-      species: 'Dwarf'
-    },
-    { 
-      id: 6, 
-      nome: 'Gollum', 
-      imagem: 'assets/gollum.jpg', 
-      votos: 0,
-      type: 'River-folk',
-      status: 'Alive',
-      species: 'Hobbit (formerly)'
-    },
-    { 
-      id: 7, 
-      nome: 'Galadriel', 
-      imagem: 'assets/galadriel.jpg', 
-      votos: 0,
-      type: 'Elf',
-      status: 'Alive',
-      species: 'Elf'
-    },
-    { 
-      id: 8, 
-      nome: 'Boromir', 
-      imagem: 'assets/boromir.jpg', 
-      votos: 0,
-      type: 'Human',
-      status: 'Deceased',
-      species: 'Human'
-    },
-    { 
-      id: 9, 
-      nome: 'Saruman', 
-      imagem: 'assets/saruman.jpg', 
-      votos: 0,
-      type: 'Maia',
-      status: 'Deceased',
-      species: 'Maia'
-    }
-  ];
+  baseUrl = 'http://localhost:3000';
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
-  getPersonagens(): IPersonagem[] {
-    return [...this.personagens];
+  getPersonagens() {
+    return this.http.get<Personagem[]>(this.baseUrl);
   }
 
-  adicionarVoto(idDoPersonagem: number): void {
-    const personagem = this.personagens.find(p => p.id === idDoPersonagem);
-    if (personagem) {
-      personagem.votos++;
-    }
+  votar(id: number): Observable<Personagem> {
+    
+    return this.http.get<Personagem>(`${this.baseUrl}/${id}`).pipe(
+      switchMap((personagem: Personagem) => {
+      
+        const updatedPersonagem = {
+          ...personagem,
+          votos: (personagem.votos || 0) + 1
+        };
+       
+        return this.http.put<Personagem>(`${this.baseUrl}/${id}`, updatedPersonagem);
+      })
+    );
   }
 }
