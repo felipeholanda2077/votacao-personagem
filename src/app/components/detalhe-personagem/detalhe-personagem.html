@@ -1,0 +1,44 @@
+@if (personagem) {
+  <div class="detalhe-wrapper">
+    <div class="header">
+      <button class="back-button" (click)="voltar()">
+        &larr; Voltar
+      </button>
+      <h2 class="titulo">🌟 Detalhes do Personagem</h2>
+    </div>
+    <div class="detalhe-conteudo">
+      <img class="imagem" [src]="personagem.imagem" [alt]="personagem.nome" />
+      <div class="info">
+        <h1 class="nome">{{ personagem.nome }}</h1>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Tipo:</span>
+            <span class="info-value">{{ personagem.type || 'Desconhecido' }}</span>
+          </div>
+          
+          <div class="info-item">
+            <span class="info-label">Espécie:</span>
+            <span class="info-value">{{ personagem.species || 'Desconhecida' }}</span>
+          </div>
+          
+          <div class="info-item">
+            <span class="info-label">Status:</span>
+            <span class="info-value" [ngClass]="getStatusClass(personagem.status)">
+              {{ personagem.status || 'Desconhecido' }}
+            </span>
+          </div>
+          
+          <div class="info-item votes">
+            <span class="info-label">🔥 Votos:</span>
+            <span class="info-value">{{ personagem.votos || 0 }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="loading">
+    <p>Carregando detalhes do personagem...</p>
+  </div>
+}

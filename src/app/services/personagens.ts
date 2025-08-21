@@ -18,12 +18,16 @@ export interface IPersonagem {
   providedIn: 'root'
 })
 export class PersonagensService {
-  baseUrl = 'http://localhost:3000';
+  private baseUrl = 'http://localhost:3000/personagens';
 
   constructor(private http: HttpClient) { }
 
   getPersonagens() {
-    return this.http.get<Personagem[]>(this.baseUrl);
+    return this.http.get<IPersonagem[]>(this.baseUrl);
+  }
+
+  getPersonagemPorId(id: number): Observable<IPersonagem> {
+    return this.http.get<IPersonagem>(`${this.baseUrl}/${id}`);
   }
 
   votar(id: number): Observable<Personagem> {

@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { PersonagemService, Personagem } from '../../services/personagem.service';
 import { Subscription, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -7,7 +8,7 @@ import { switchMap } from 'rxjs/operators';
 @Component({
   selector: 'app-lista-personagem',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './lista-personagem.html',
   styleUrls: ['./lista-personagem.css']
 })

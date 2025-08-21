@@ -1,5 +1,7 @@
 <app-header />
 <main class="container">
-  <app-lista-personagem />
+  <router-outlet></router-outlet>
+  <!-- Mantém a lista de personagens na rota raiz -->
+  <app-lista-personagem *ngIf="!isDetailRoute" />
 </main>
 <app-footer />

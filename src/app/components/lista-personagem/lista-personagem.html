@@ -11,16 +11,18 @@
 
   <div class="grid">
     <div *ngFor="let personagem of personagens | slice:0:visibleCount" class="card">
-      <img [src]="personagem.imagem" [alt]="personagem.nome" />
-      <div class="info">
-        <h3>{{ personagem.nome }}</h3>
-        <div class="voting-section">
-          <span>Votos: {{ personagem.votos || 0 }}</span>
-          <button (click)="onVotar(personagem)" [disabled]="isVoting(personagem.id)">
-            {{ isVoting(personagem.id) ? 'Votando...' : 'Votar' }}
-          </button>
+      <a [routerLink]="['/personagens', personagem.id]" class="card-link">
+        <img [src]="personagem.imagem" [alt]="personagem.nome" />
+        <div class="info">
+          <h3>{{ personagem.nome }}</h3>
+          <div class="voting-section">
+            <span>Votos: {{ personagem.votos || 0 }}</span>
+            <button (click)="$event.preventDefault(); onVotar(personagem)" [disabled]="isVoting(personagem.id)">
+              {{ isVoting(personagem.id) ? 'Votando...' : 'Votar' }}
+            </button>
+          </div>
         </div>
-      </div>
+      </a>
     </div>
   </div>
 
